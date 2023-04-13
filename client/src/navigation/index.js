@@ -13,7 +13,7 @@ export const RootStack = () => {
         <RootStackNavigator.Navigator>
             <RootStackNavigator.Screen name='Entry' component={Entry} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name='Login' component={Login}/>
-            <RootStackNavigator.Screen name='Register' component={Register}/>
+            <RootStackNavigator.Screen name='Register' component={Register} options={{ headerShown:false }}/>
         </RootStackNavigator.Navigator>
     )
 }
