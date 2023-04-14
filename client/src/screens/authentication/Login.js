@@ -7,10 +7,19 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Foundation from 'react-native-vector-icons/Foundation';
 import {  } from 'react-native-gesture-handler';
 import LoginStyle from './style/LoginStyle';
+import GradientText from '../../components/GradientText';
+import ForgetPasswordModal from './Modals/ForgetPasswordModal';
+import { loginAction, getUser } from '../../store/actions/index';
+import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function Login({ navigation }) {
-    
+    const dispatch = useDispatch();
+    const [ email, setEmail ] = useState("");
+    const [ password, setPassword ] = useState("");
+    const [ forgetPasswordVisible, setForgetPasswordVisible ] = useState(false);
+    const [ errorMessage, setErrorMessage ] = useState("");
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => {
@@ -50,9 +59,11 @@ function Login({ navigation }) {
             color={Colors.purple1}
         />,
 
-        <Text style={LoginStyle.animationsText}>
-            Share your posts with us
-        </Text>,
+        <GradientText>
+            <Text style={LoginStyle.animationsText}>
+                Share your posts with us
+            </Text>
+        </GradientText>,
         
         <Foundation
             name='play-video'
@@ -60,9 +71,11 @@ function Login({ navigation }) {
             color={Colors.purple1}
         />,
 
-        <Text style={LoginStyle.animationsText}>
-            Share videos and photos
-        </Text>,
+        <GradientText>
+            <Text style={LoginStyle.animationsText}>
+                Share videos and photos
+            </Text>
+        </GradientText>,
 
         <Ionicons
             name='chatbubble-ellipses-outline'
@@ -70,9 +83,11 @@ function Login({ navigation }) {
             color={Colors.purple1}
         />,
 
-        <Text style={LoginStyle.animationsText}>
-            Talk with new people on live group chats
-        </Text>,
+        <GradientText>
+            <Text style={LoginStyle.animationsText}>
+                Talk with new people on live group chats
+            </Text>
+        </GradientText>,
 
     ]
     
@@ -80,31 +95,82 @@ function Login({ navigation }) {
     const [ animationIndex, setAnimationIndex ] = useState(0);
 
     
-    // useEffect(() => {
+    useEffect(() => {
         
-    //     const fadeInAndOut = () => {
-    //         Animated.timing(opacityValue, {
-    //             toValue: 1,
-    //             duration: 3000,
-    //             useNativeDriver: true,
-    //           }).start(() => {
-    //             Animated.timing(opacityValue, {
-    //                 toValue: 0,
-    //                 duration: 3000,
-    //                 useNativeDriver: true,
-    //             }).start(() => {
-    //                 setAnimationIndex(prevIndex => (prevIndex + 1) % animations.length);
-    //                 fadeInAndOut();
-    //             });
-    //           });
-    //     }
-    //     fadeInAndOut();
-    // }, [])
-
+        const fadeInAndOut = () => {
+            Animated.timing(opacityValue, {
+                toValue: 1,
+                duration: 3000,
+                useNativeDriver: true,
+              }).start(() => {
+                Animated.timing(opacityValue, {
+                    toValue: 0,
+                    duration: 3000,
+                    useNativeDriver: true,
+                }).start(() => {
+                    setAnimationIndex(prevIndex => (prevIndex + 1) % animations.length);
+                    fadeInAndOut();
+                });
+              });
+        }
+        fadeInAndOut();
+    }, [])
+    
+    const isAuthUser = async() => {
+        try{
+            const jsonToken = await AsyncStorage.getItem('Token'); 
+            const userToken = jsonToken != null ? JSON.parse(jsonToken) : null; 
+            if(userToken) {
+                dispatch(getUser(userToken))
+                .then(() => {
+                    navigation.navigate("OverView");
+                })
+            }
+        }catch(error) {
+            console.log(error.message);
+        }
+    }
+    isAuthUser();
+    const login = async() => {
+        Keyboard.dismiss();
+        console.log("login");
+        if(email === "" || password === "") {
+            setErrorMessage("Email and Password required");
+            setTimeout(() => {
+                setErrorMessage("");
+                setEmail("");
+                setPassword("");
+            }, 3000)
+        } else {
+            await loginAction({email, password})
+            .then(async loginresponse => {
+                if(!loginresponse.status) {
+                    setErrorMessage(loginresponse.message)
+                    setTimeout(() => {
+                        setErrorMessage("");
+                        setEmail("");
+                        setPassword("");
+                    }, 3000)
+                } else {
+                    try{
+                        const jsonToken = JSON.stringify(loginresponse.token);
+                        await AsyncStorage.setItem('Token', jsonToken)
+                        isAuthUser();
+                    }catch(error) {
+                        console.log(error.message);
+                    }
+                }
+            })
+        }
+    }
    
     
     return (  
-        <KeyboardAvoidingView behavior="position" style={{ flex:1 }} >
+        <KeyboardAvoidingView behavior={forgetPasswordVisible ? "height" : "position"} style={{ flex:1 }} >
+            <ForgetPasswordModal
+                visible={forgetPasswordVisible}
+                setVisible={setForgetPasswordVisible}
+            />
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={LoginStyle.container}>
                     <Animated.View style={{
@@ -115,7 +181,12 @@ function Login({ navigation }) {
                     }}>
                         {animations[animationIndex]}
                     </Animated.View>
-                    
+                    {
+                        errorMessage !== "" &&
+                        <Text style={LoginStyle.errorMessage}>
+                            {errorMessage}
+                        </Text>
+                    }
                     <View style={LoginStyle.formContainer}>
                         <Text style={{
                             fontFamily:"regular",
@@ -127,6 +198,8 @@ function Login({ navigation }) {
                         <TextInput
                             style={LoginStyle.TextInputStyle}
                             placeholder='Email Address...'
+                            value={email}
+                            onChangeText={text => setEmail(text)}
                         />
 
                         <Text style={{
@@ -140,8 +213,10 @@ function Login({ navigation }) {
                             style={LoginStyle.TextInputStyle}
                             placeholder='Password...'
                             secureTextEntry
+                            value={password}
+                            onChangeText={text => setPassword(text)}
                         />
-                        <TouchableOpacity style={LoginStyle.forgetAndSignUpContainer}>
+                        <TouchableOpacity onPress={() => setForgetPasswordVisible(true)} style={LoginStyle.forgetAndSignUpContainer}>
                             <Text style={LoginStyle.forgetAndSignUpText}>
                                 Forget Password ?
                             </Text>
@@ -149,7 +224,7 @@ function Login({ navigation }) {
                         
                     </View>
 
-                    <TouchableOpacity style={LoginStyle.loginButtonContainer}>
+                    <TouchableOpacity onPress={login} style={LoginStyle.loginButtonContainer}>
                         <LinearGradient 
                             colors={[Colors.blue1, Colors.purple1]}
                             style={LoginStyle.LinearGradientLoginButton}

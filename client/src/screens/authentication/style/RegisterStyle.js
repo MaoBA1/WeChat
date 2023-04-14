@@ -66,7 +66,8 @@ export default StyleSheet.create({
         justifyContent:"center",
         alignItems:"center",
         borderRadius:50,
-        position:"relative"
+        position:"relative",
+        padding:1
     },
     editImageContainer: {
         width:30,
@@ -77,7 +78,20 @@ export default StyleSheet.create({
         backgroundColor: "grey",
         position:'absolute',
         top:0,
-        right:-5
+        right:-5,
+        zIndex:1
+    },
+    deletIconContainer: {
+        borderRadius:50,
+        backgroundColor:"red",
+        width:30,
+        height:30,
+        alignItems:"center",
+        justifyContent:"center",
+        position:"absolute",
+        zIndex:1,
+        top: 0,
+        left: -5
     },
     signUpButtonContainer: {
         width:100,
@@ -91,5 +105,31 @@ export default StyleSheet.create({
     signUpButtonText: {
         color: "#FFFFFFFF",
         fontFamily:"bold"
+    },
+    ModalContainer: {
+        backgroundColor: Colors.whiteBackground,
+        width:"100%",
+        height:"100%",
+        opacity: 0.5,
+        alignItems:"center",
+        justifyContent:"center",
+    },
+    ModalCard: {
+        width:"80%",
+        height:200,
+        backgroundColor: Colors.purple1,
+        zIndex:1,
+        position:'absolute',
+        alignSelf:"center",
+        top:"30%",
+        borderRadius:20,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    ModalText: {
+        fontFamily:"regular",
+        fontSize:18,
+        color: "#FFFFFFFF",
+        textAlign:"center"
     }
 });

@@ -2,8 +2,16 @@ import React, { useEffect, useState, useCallback } from 'react';
 import * as Font from 'expo-font';
 import { RootStack } from './src/navigation/index';
 import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import Reducer from './src/store/reducers/index';
 
+const RootReducer = combineReducers({
+  Reducer: Reducer
+});
 
+const store = createStore(RootReducer, applyMiddleware(ReduxThunk));
 
 const loadFontsFromAssets = () => {
   return Font.loadAsync({
@@ -48,9 +56,11 @@ export default function App() {
 
 
   return (
-    <NavigationContainer>
-      <RootStack/>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <RootStack/>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

@@ -65,5 +65,12 @@ export default StyleSheet.create({
         textShadowColor:Colors.blue1,
         textShadowOffset: { width:0, height:4 },
         textShadowRadius:2,
+    },
+    errorMessage: {
+        marginBottom:30,
+        fontFamily:"regular",
+        color:"red",
+        fontSize:18,
+        textAlign:"center"
     }
 });
