@@ -50,12 +50,15 @@ function Friends({ navigation }) {
                     </Text>
                 </View>
             }
+            <View style={{
+                flex:1,
+            }}>
             {
                 allFriendsAcconts?.filter(f => f.status === "friend")?.length > 0 &&
                 <View style={{
                     width:"100%",
-                    height:"35%",
-                    justifyContent:"space-between"
+                    height:"30%",
+                    justifyContent:"space-between",
                 }}>
                     <View>
                         <Text style={{
@@ -75,7 +78,7 @@ function Friends({ navigation }) {
                         renderItem={({ item, index }) => 
                             <View style={{
                                 backgroundColor:"#FFFFFFFF",
-                                height:200,
+                                height:"80%",
                                 width:150,
                                 margin:10,
                                 borderRadius:10,
@@ -88,7 +91,7 @@ function Friends({ navigation }) {
                                         width:50,
                                         height:50,
                                         borderRadius:30,
-                                        resizeMode:"contain"
+                                        resizeMode:"cover"
                                     }}
                                 />
                                 <Text
@@ -105,6 +108,64 @@ function Friends({ navigation }) {
                     />
                 </View>
             }
+
+
+            {
+                allFriendsAcconts?.filter(f => f.status === "wait")?.length > 0 &&
+                <View style={{
+                    width:"100%",
+                    height:"30%",
+                    justifyContent:"space-between",
+                }}>
+                    <View>
+                        <Text style={{
+                            paddingLeft:10,
+                            paddingTop:10,
+                            fontFamily:"regular",
+                            fontSize:20,
+                            color: Colors.purple1
+                        }}>
+                            Waiting for admit
+                        </Text>
+                    </View>
+                    <FlatList
+                        horizontal
+                        data={allFriendsAcconts?.filter(f => f.status === "wait")}
+                        keyExtractor={item => item._id}
+                        renderItem={({ item, index }) => 
+                            <View style={{
+                                backgroundColor:"#FFFFFFFF",
+                                height:"80%",
+                                width:150,
+                                margin:10,
+                                borderRadius:10,
+                                alignItems:"center",
+                                padding:10
+                            }}>
+                                <Image
+                                    source={{ uri: item?.profileImage }}
+                                    style={{
+                                        width:50,
+                                        height:50,
+                                        borderRadius:30,
+                                        resizeMode:"cover"
+                                    }}
+                                />
+                                <Text
+                                    style={{
+                                        marginTop:5,
+                                        fontFamily:"regular",
+                                        color: Colors.purple1
+                                    }}
+                                >
+                                    {item?.fname + " " + item?.lname}
+                                </Text>
+                            </View>
+                        }
+                    />
+                </View>
+            }
+            </View>
         </View>
     );
 }
