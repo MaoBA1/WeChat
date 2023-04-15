@@ -1,17 +1,17 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, Text, Animated, TextInput, KeyboardAvoidingView, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Animated, TextInput, KeyboardAvoidingView, TouchableOpacity, Keyboard, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import Colors from '../../utilities/Colors';
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
-import {  } from 'react-native-gesture-handler';
 import LoginStyle from './style/LoginStyle';
 import GradientText from '../../components/GradientText';
 import ForgetPasswordModal from './Modals/ForgetPasswordModal';
 import { loginAction, getUser } from '../../store/actions/index';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setupSocket } from '../../../SetupScoket';
 
 
 function Login({ navigation }) {
@@ -20,6 +20,8 @@ function Login({ navigation }) {
     const [ password, setPassword ] = useState("");
     const [ forgetPasswordVisible, setForgetPasswordVisible ] = useState(false);
     const [ errorMessage, setErrorMessage ] = useState("");
+    const [ isLoading, setIsLoading ] = useState(false);
+
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => {
@@ -121,16 +123,21 @@ function Login({ navigation }) {
             const jsonToken = await AsyncStorage.getItem('Token'); 
             const userToken = jsonToken != null ? JSON.parse(jsonToken) : null; 
             if(userToken) {
+                setIsLoading(true);
                 dispatch(getUser(userToken))
                 .then(() => {
-                    navigation.navigate("OverView");
+                    setTimeout(() => {
+                        setupSocket(userToken, dispatch);
+                        navigation.navigate("OverView");
+                        setIsLoading(false);
+                    }, 2000)
                 })
             }
         }catch(error) {
             console.log(error.message);
         }
     }
-    isAuthUser();
+    
     const login = async() => {
         Keyboard.dismiss();
         console.log("login");
@@ -164,6 +171,14 @@ function Login({ navigation }) {
         }
     }
    
+    if(isLoading) {
+        return <View style={[LoginStyle.container, { justifyContent:"center" }]}>
+            <ActivityIndicator
+                color={Colors.purple1}
+                size={"large"}
+            />
+        </View>
+    }
     
     return (  
         <KeyboardAvoidingView behavior={forgetPasswordVisible ? "height" : "position"} style={{ flex:1 }} >

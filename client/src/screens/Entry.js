@@ -1,12 +1,32 @@
-import React from 'react';
-import { ImageBackground, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, StatusBar, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from '../utilities/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import {  getUser } from '../store/actions/index';
+import { setupSocket } from '../../SetupScoket';
 
 function Entry({ navigation }) {
+    const dispatch = useDispatch();
+    const isAuthUser = async() => {
+        try{
+            const jsonToken = await AsyncStorage.getItem('Token'); 
+            const userToken = jsonToken != null ? JSON.parse(jsonToken) : null; 
+            if(userToken) {
+                dispatch(getUser(userToken))
+                .then(() => {
+                    setupSocket(userToken, dispatch);
+                    navigation.navigate("OverView");
+                })
+            }
+        }catch(error) {
+            console.log(error.message);
+        }
+    }
+    isAuthUser();
+    
+
     return (
         <LinearGradient 
             colors={[Colors.blue1, Colors.purple1]}

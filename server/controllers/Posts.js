@@ -4,20 +4,33 @@ const Account = require('../models/Account');
 
 
 
-const recive_all_post = (socket) => {
+const recive_all_post = (io) => {
     Post.find({})
     .then(posts => {
-        return socket.emit("recive_all_post", {posts: posts});
+        return io.emit("recive_all_post", {posts: posts.sort((a, b) => (new Date(b.creatAdt) - new Date(a.creatAdt)))});
+    })
+}
+
+const recive_all_account_posts = async(socket, accountId) => {
+    Post.find({'postAuthor._id': accountId}).lean()
+    .then(posts => {
+        posts.sort((a, b) => (new Date(b.creatAdt) - new Date(a.creatAdt)));
+        return socket.emit("recive_all_account_posts", {posts: posts});
     })
 }
 
 
-
-
-
 const postEvents = (io, socket) => {
     
-    
+    socket.on("recive_all_post", (data) => {
+        recive_all_post(io);
+    })
+
+    socket.on("recive_all_account_posts", (data) => {
+        const { accountId } = data;
+        recive_all_account_posts(socket, accountId);
+    })
+
     socket.on("create_post", (data) => {
         const {
             postAuthor,
@@ -32,15 +45,7 @@ const postEvents = (io, socket) => {
         })
         return new_post.save()
         .then(() => {
-            Post.find({})
-            .then(posts => {
-                if(posts) {
-                    io.emit("recive_all_post", {
-                        status: true,
-                        posts: posts
-                    })
-                }
-            })
+            recive_all_post(io);
         })
         .catch(error => {
             console.log(error.message);
@@ -51,7 +56,8 @@ const postEvents = (io, socket) => {
     socket.on("give_like_to_post", (data) => {
         const {
             postId,
-            account
+            account,
+            accountFriends
         } = data;
 
         Post.findById(postId)
@@ -59,11 +65,14 @@ const postEvents = (io, socket) => {
             if(post) {
                 post.likes.push(account);
                 return post.save()
-                .then(() => {
-                    Post.find({})
-                    .then((posts) => {
-                        return io.emit("recive_all_post", {posts: posts});
-                    })                    
+                .then((post) => {
+                    // if(post.postAuthor._id.toString() === account) {
+                    //     recive_all_account_posts(socket, account);
+                    //     recive_all_friends_posts(io, accountFriends);
+                    //     return;
+                    // }          
+                    // recive_all_friends_posts(io, accountFriends); 
+                    recive_all_post(io);         
                 })                
             }
         })
@@ -75,19 +84,23 @@ const postEvents = (io, socket) => {
     socket.on("unlike_post", (data) => {
         const {
             postId,
-            accountId
+            account,
+            accountFriends
         } = data;
         
         Post.findById(postId)
         .then(post => {
             if(post) {
-                post.likes = post.likes.filter(l => l._id.toString() !== accountId.toString());
+                post.likes = post.likes.filter(l => l._id.toString() !== account.toString());
                 return post.save()
-                .then(() => {
-                    Post.find({})
-                    .then((posts) => {
-                        return io.emit("recive_all_post", {posts: posts});
-                    })                    
+                .then((post) => {
+                    // if(post.postAuthor._id.toString() === account) {
+                    //     recive_all_account_posts(socket, account);
+                    //     recive_all_friends_posts(io, accountFriends);
+                    //     return;
+                    // }          
+                    // recive_all_friends_posts(io, accountFriends); 
+                    recive_all_post(io);         
                 }) 
             }
         })
@@ -100,7 +113,8 @@ const postEvents = (io, socket) => {
         const {
             postId,
             comment,
-            account
+            account,
+            accountFriends
         } = data;
 
         Post.findById(postId)
@@ -120,8 +134,13 @@ const postEvents = (io, socket) => {
                 .then(updated_post => {
                     Post.find({})
                     .then((posts) => {
-                        io.emit("recive_all_post", {posts: posts});
+                        // if(post.postAuthor._id.toString() === account._id) {
+                        //     recive_all_account_posts(socket, account._id);
+                        // }          
+                        // recive_all_friends_posts(io, accountFriends);
+                        // io.emit("get_updated_post", {updated_post: updated_post});
                         io.emit("get_updated_post", {updated_post: updated_post});
+                        recive_all_post(io);
                     }) 
                 })
             }

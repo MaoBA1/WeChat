@@ -4,8 +4,16 @@ import serverBaseUrl from "../../../serverBaseUrl";
 export const LOGIN = "LOGIN";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 export const SET_ALL_POSTS = "SET_ALL_POSTS";
+export const SET_ALL_ACCOUNT_POST = "SET_ALL_ACCOUNT_POST";
 export const SET_ALL_CHATS = "SET_ALL_CHATS";
 export const CLEAN_ALL_REDUCER_STATES = "CLEAN_ALL_REDUCER_STATES";
+export const SET_SOCKET = "SET_SOCKET";
+
+export const setSocket = (socket) => {
+    return dispatch => {
+        dispatch({ type: SET_SOCKET, socket: socket  });
+    }
+} 
 
 export const cleanAllReducerStates = () => {
     return dispatch => {
@@ -86,6 +94,26 @@ export const setAllPosts = async( response, dispatch ) => {
     }
 
 }
+
+export const setAllAccountPostDispatch = (posts) => {
+    return dispatch => {
+        dispatch({ type: SET_ALL_ACCOUNT_POST, posts: posts })
+    }
+}
+
+export const setAllAccountPosts = async( response, dispatch ) => {
+    if(response.posts) {
+        let action = setAllAccountPostDispatch(response.posts);
+        try{
+            await dispatch(action);
+        } catch(error) {
+            console.log(error.message);
+        }
+    }
+
+}
+
+
 
 export const setAllChats = (chats) => {
     return dispatch => {

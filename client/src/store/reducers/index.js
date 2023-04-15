@@ -1,20 +1,29 @@
 import { 
     SET_ALL_POSTS,
+    SET_ALL_ACCOUNT_POST,
     SET_CURRENT_USER,
     SET_ALL_CHATS,
-    CLEAN_ALL_REDUCER_STATES
+    CLEAN_ALL_REDUCER_STATES,
+    SET_SOCKET,
 } from '../actions/index';
 
 
 const intialState = {
     User: null,
     Posts: null,
-    Chats: null
+    AccountPosts: null,
+    Chats: null,
+    Socket: null,
 }
 
 // eslint-disable-next-line
 export default (state = intialState, action) => {
     switch(action.type) {
+        case SET_SOCKET:
+            return {
+                ...state,
+                Socket: action.socket
+            }
         case SET_CURRENT_USER:
             return {
                 ...state,
@@ -24,6 +33,11 @@ export default (state = intialState, action) => {
             return {
                 ...state,
                 Posts: action.posts
+            }
+        case SET_ALL_ACCOUNT_POST:
+            return {
+                ...state,
+                AccountPosts: action.posts
             }
         case SET_ALL_CHATS:
             return {
