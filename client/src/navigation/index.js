@@ -17,7 +17,7 @@ import Home from '../screens/overview/Home';
 import Profile from '../screens/overview/Profile';
 import Messages from '../screens/overview/Messages';
 import Friends from '../screens/overview/Friends';
-
+import OtherAccountProfile from '../screens/overview/OtherAccountProfile';
 
 
 
@@ -28,6 +28,7 @@ export const RootStack = () => {
             <RootStackNavigator.Screen name='Entry' component={Entry} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name='Login' component={Login}/>
             <RootStackNavigator.Screen name='Register' component={Register} options={{ headerShown:false }}/>
+            <RootStackNavigator.Screen name='OtherProfile' component={OtherAccountProfile} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name="OverView" component={OverViewStack} options={{ headerShown:false }}/>
         </RootStackNavigator.Navigator>
     )
@@ -104,7 +105,8 @@ export const OverViewStack = () => {
                             />
                             )
                 
-                        },   
+                        }, 
+                        headerShown: false  
                     }} 
                     name='Freinds'
                     component={Friends}
@@ -125,7 +127,8 @@ export const OverViewStack = () => {
                             />
                             )
                 
-                        },   
+                        },  
+                        headerShown: false 
                     }} 
                     name='Messages'
                     component={Messages}
@@ -141,7 +144,7 @@ export const OverViewStack = () => {
                     width: '100%',
                     position: 'absolute',
                     bottom: 0,
-                    zIndex: -1, // Set zIndex to -1
+                    zIndex: -1, 
                 }}
             />
         </View>

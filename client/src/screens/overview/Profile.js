@@ -5,6 +5,7 @@ import Colors from '../../utilities/Colors';
 import PostCommentsModal from './Modals/PostCommentsModal';
 import ProfileHeader from '../../components/ProfileHeader';
 import Post from '../../components/Post';
+import UploadPostModal from './Modals/UploadPostModal';
 
 function Profile({ navigation }) {
     const socket = useSelector(state => state.Reducer.Socket);
@@ -17,6 +18,7 @@ function Profile({ navigation }) {
     const [ commentModalVisible, setCommentModalVisible ] = useState(false);
     const [ allFriendsAcconts, setAllFriendsAccounts ] = useState([]);
     const [ intialUserData, setIntialUserData ] = useState(userSelector);
+    const [ uploadPostModatVisible, setUploadPostModalVisible ] = useState(false);
     
     const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -44,6 +46,10 @@ function Profile({ navigation }) {
                 cleanPost={() => setPostForCommentModal(null)}
                 post={postForCommentModal}
             />
+            <UploadPostModal
+                visible={uploadPostModatVisible}
+                setIsVisible={setUploadPostModalVisible}
+            />
             <Animated.FlatList
                 style={{ flex:1 }}
                 contentContainerStyle={{ paddingTop:150 }}
@@ -61,7 +67,7 @@ function Profile({ navigation }) {
                     { useNativeDriver: true }
                 )}
             />
-            <ProfileHeader scrollY={scrollY} friendsCount={allFriendsAcconts?.length}/>
+            <ProfileHeader scrollY={scrollY} friendsCount={allFriendsAcconts?.length} setUploadPostModalVisible={setUploadPostModalVisible}/>
         </View>
     );
 }

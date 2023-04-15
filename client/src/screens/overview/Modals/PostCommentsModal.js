@@ -117,7 +117,7 @@ function PostCommentsModal({
                         {
                             <FlatList
                                 data={post?.comments?.sort((a, b) => (new Date(b.creatAdt) - new Date(a.creatAdt)))}
-                                keyExtractor={({item, index}) => index}
+                                keyExtractor={item => item.creatAdt}
                                 renderItem={({item, index}) => 
                                     <View
                                         key={index}

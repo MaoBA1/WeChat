@@ -217,7 +217,8 @@ const accountEvents = (io, socket) => {
                         lname: account.lname,
                         profileImage: account.profileImage,
                         lastProfileImage: account.lastProfileImage,
-                        posts: accountPosts
+                        posts: accountPosts,
+                        friends: account.friends
                     }
                         
                     return socket.emit('get_account_by_id', {

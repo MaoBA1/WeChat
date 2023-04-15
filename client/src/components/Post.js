@@ -11,7 +11,8 @@ import { useSelector } from 'react-redux';
 function Post({
     post,
     setPostForCommentModal,
-    setCommentModalVisible
+    setCommentModalVisible,
+    navigate
 }) {
     const userSelector = useSelector(state => state.Reducer.User);
     const socket = useSelector(state => state.Reducer.Socket);
@@ -42,10 +43,17 @@ function Post({
                 justifyContent:"space-between",
                 alignItems:"center"
             }}>
-                <View style={{
-                    flexDirection:"row",
-                    alignItems:"center",
-                }}>
+                <TouchableOpacity 
+                    style={{
+                        flexDirection:"row",
+                        alignItems:"center",
+                    }} 
+                    onPress={() => {
+                        if(post?.postAuthor._id !== userSelector._id) {
+                            navigate();
+                        }
+                    }}
+                >
                     <Image
                         source={{ uri: post?.postAuthor?.profileImage }}
                         style={{
@@ -62,7 +70,7 @@ function Post({
                     }}>
                         {post?.postAuthor?.fname + " " + post?.postAuthor?.lname}
                     </Text>
-                </View>
+                </TouchableOpacity>
 
                 <View>
                     <Text style={{

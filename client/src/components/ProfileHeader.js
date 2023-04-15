@@ -5,7 +5,7 @@ import Colors from '../utilities/Colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
 
-function ProfileHeader({ scrollY, friendsCount }) {
+function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
     const userSelector = useSelector(state => state.Reducer.User);
     const userPostSelector = useSelector(state => state.Reducer.AccountPosts);
 
@@ -125,12 +125,12 @@ function ProfileHeader({ scrollY, friendsCount }) {
                                     backgroundColor:"#FFFFFFFF",
                                     borderRadius:50,
                                 }}
+                                onPress={() => setUploadPostModalVisible(true)}
                             >
                                 <Ionicons
                                     name="add"
                                     color={Colors.purple1}
                                     size={25}
-                                    // onPress={logout}
                                 />
                             </TouchableOpacity>
                         </View>
