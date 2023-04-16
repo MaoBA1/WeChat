@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Animated, TouchableOpacity, Image } from 'react-native';
 import SimpleCostumHeader from '../../components/SimpleCostumHeader';
 import Colors from '../../utilities/Colors';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
+import CreatNewPrivateChat from './Modals/CreateNewPrivateChat';
+import CreatNewGroupChatScreen from './Modals/CreatNewGroupChatScreen';
 
 
 function Messages({ navigation }) {
@@ -12,6 +14,9 @@ function Messages({ navigation }) {
     const userChats = useSelector(state => state.Reducer.Chats);
     const userSelector = useSelector(state => state.Reducer.User);
 
+
+    const [ creatNewPrivateChatVisible, setCreatNewPrivateChatVisible ] = useState(false);
+    const [ creatNewGroupChatVisible, setCreatNewGroupChatVisible ] = useState(false);
 
     const scrollY = useRef(new Animated.Value(0)).current;
     const headerTranslateY = scrollY.interpolate({
@@ -84,133 +89,162 @@ function Messages({ navigation }) {
             backgroundColor: Colors.whiteBackground,
 
         }}>
-            
-            <Animated.FlatList
-                style={{
-                    position:"absolute",
-                    top:100,
-                    width:"100%"
-                }}
-                data={
-                    userChats
-                    .sort((a,b) => (new Date(b?.messages[b?.messages?.length -1]?.creatAdt) - new Date(a?.messages[a?.messages?.length -1]?.creatAdt)))
-                }
-                keyExtractor={item => item._id}
-                renderItem={({ item, index }) => {
-                    const chat = getChatDetails(item);
-                    return(
-                        <TouchableOpacity 
-                            style={{
-                                paddingHorizontal:10,
-                                height:80,
-                                backgroundColor:"#FFFFFFFF",
-                                borderBottomWidth:0.5,
-                                flexDirection:'row',
-                                alignItems:"center",
-                                justifyContent:"space-between"
-                            }} 
-                            onPress={
-                                item?.chatType === "private" ?
-                                () => navigation.navigate("PrivateChat", { accountId: chat?.participantId })
-                                :
-                                () => navigation.navigate("PrivateChat", { accountId: chat?.participantId })
-                            }
-                        >
-                            <View style={{
-                                flexDirection:"row"
-                            }}>
-                                {
-                                    item?.chatType === "private" ?
-                                    (
-                                        <Image
-                                            source={{ uri: chat?.image }}
-                                            style={{
-                                                width:40,
-                                                height:40,
-                                                borderRadius:50
-                                            }}
-                                        />
-                                    )
-                                    :
-                                    (
-                                        <View style={{
-                                            width:40,
-                                            height:40,
-                                            borderRadius:50,
-                                            backgroundColor: Colors.blue1,
-                                            alignItems:"center",
-                                            justifyContent:"center"
-                                        }}>
-                                            <FontAwesome
-                                                name='group'
-                                                color={"#FFFFFFFF"}
-                                                size={15}
-                                            />
-                                        </View>
-                                    )
-                                }
-                                <View style={{
-                                    marginLeft:10,
-                                    width:200
-                                }}>
-                                    <Text style={{
-                                        fontFamily:"regular",
-                                        color: Colors.purple1,
-                                        fontSize:16
-                                    }} numberOfLines={1}>
-                                        {chat?.header}
-                                    </Text>
-                                    <Text style={{
-                                        fontFamily:"regular",
-                                        color: Colors.blue1, 
-                                    }} numberOfLines={1}>
-                                        {chat?.sender + ": " + chat?.lastMessage?.message}
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={{
-                                height:"70%",
-                                alignItems:"flex-end",
-                                justifyContent:"space-between"
-                            }}>
-                                <Text style={{
-                                    fontFamily:"italic",
-                                    color:"grey",
-                                    fontSize:12,
-                                    alignSelf:"flex-start"
-                                }}>
-                                    {chat?.lastMessage?.creatAdt}
-                                </Text>
+            <CreatNewPrivateChat
+                visible={creatNewPrivateChatVisible}
+                setIsVisible={setCreatNewPrivateChatVisible}
+                navigate={navigation.navigate}
+            />
 
-                                {
-                                    chat?.notReaded > 0 &&
-                                    <View style={{
-                                        backgroundColor: Colors.purple1,
-                                        width:25,
-                                        height:25,
-                                        borderRadius:50,
+            <CreatNewGroupChatScreen
+                visible={creatNewGroupChatVisible}
+                setIsVisible={setCreatNewGroupChatVisible}
+                navigate={navigation.navigate}
+            />
+            {   userChats?.length === 0 ?
+                (
+                    <View style={{
+                        flex:1,
+                        alignItems:"center",
+                        justifyContent:"center" 
+                    }}>
+                        <Text style={{
+                            fontFamily:"regular",
+                            color: Colors.blue1,
+                            fontSize:18
+                        }}>
+                            You don't have open chats yet...
+                        </Text>
+                    </View>
+                )
+                :
+                (
+                    <Animated.FlatList
+                        style={{
+                            position:"absolute",
+                            top:100,
+                            width:"100%"
+                        }}
+                        data={
+                            userChats
+                            ?.sort((a,b) => (new Date(b?.messages[b?.messages?.length -1]?.creatAdt) - new Date(a?.messages[a?.messages?.length -1]?.creatAdt)))
+                        }
+                        keyExtractor={item => item._id}
+                        renderItem={({ item, index }) => {
+                            const chat = getChatDetails(item);
+                            return(
+                                <TouchableOpacity 
+                                    style={{
+                                        paddingHorizontal:10,
+                                        height:80,
+                                        backgroundColor:"#FFFFFFFF",
+                                        borderBottomWidth:0.5,
+                                        flexDirection:'row',
                                         alignItems:"center",
-                                        justifyContent:"center"
+                                        justifyContent:"space-between"
+                                    }} 
+                                    onPress={
+                                        item?.chatType === "private" ?
+                                        () => navigation.navigate("PrivateChat", { accountId: chat?.participantId })
+                                        :
+                                        () => navigation.navigate("GroupChat", { chatId: item?._id })
+                                    }
+                                >
+                                    <View style={{
+                                        flexDirection:"row"
+                                    }}>
+                                        {
+                                            item?.chatType === "private" ?
+                                            (
+                                                <Image
+                                                    source={{ uri: chat?.image }}
+                                                    style={{
+                                                        width:40,
+                                                        height:40,
+                                                        borderRadius:50
+                                                    }}
+                                                />
+                                            )
+                                            :
+                                            (
+                                                <View style={{
+                                                    width:40,
+                                                    height:40,
+                                                    borderRadius:50,
+                                                    backgroundColor: Colors.blue1,
+                                                    alignItems:"center",
+                                                    justifyContent:"center"
+                                                }}>
+                                                    <FontAwesome
+                                                        name='group'
+                                                        color={"#FFFFFFFF"}
+                                                        size={15}
+                                                    />
+                                                </View>
+                                            )
+                                        }
+                                        <View style={{
+                                            marginLeft:10,
+                                            width:200
+                                        }}>
+                                            <Text style={{
+                                                fontFamily:"regular",
+                                                color: Colors.purple1,
+                                                fontSize:16
+                                            }} numberOfLines={1}>
+                                                {chat?.header}
+                                            </Text>
+                                            <Text style={{
+                                                fontFamily:"regular",
+                                                color: Colors.blue1, 
+                                            }} numberOfLines={1}>
+                                                {chat?.sender + ": " + chat?.lastMessage?.message}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    <View style={{
+                                        height:"70%",
+                                        alignItems:"flex-end",
+                                        justifyContent:"space-between"
                                     }}>
                                         <Text style={{
                                             fontFamily:"italic",
-                                            color:"#FFFFFFFF"
+                                            color:"grey",
+                                            fontSize:12,
+                                            alignSelf:"flex-start"
                                         }}>
-                                            {chat?.notReaded}
+                                            {chat?.lastMessage?.creatAdt}
                                         </Text>
+
+                                        {
+                                            chat?.notReaded > 0 &&
+                                            <View style={{
+                                                backgroundColor: Colors.purple1,
+                                                width:25,
+                                                height:25,
+                                                borderRadius:50,
+                                                alignItems:"center",
+                                                justifyContent:"center"
+                                            }}>
+                                                <Text style={{
+                                                    fontFamily:"italic",
+                                                    color:"#FFFFFFFF"
+                                                }}>
+                                                    {chat?.notReaded}
+                                                </Text>
+                                            </View>
+                                        }
                                     </View>
-                                }
-                            </View>
-                        </TouchableOpacity>
-                    )
-                }}
-                contentContainerStyle={{ paddingTop:48 }}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
-                )}
-            />
-            
+                                </TouchableOpacity>
+                            )
+                        }}
+                        contentContainerStyle={{ paddingTop:48 }}
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                            { useNativeDriver: true }
+                        )}
+                    />
+                )
+            }
             <Animated.View 
                 style={{
                     transform: [{translateY: headerTranslateY}],
@@ -242,7 +276,7 @@ function Messages({ navigation }) {
                             justifyContent:"center",
                             zIndex:1
                         }}
-                        onPress={() => console.log("test")}
+                        onPress={() => setCreatNewPrivateChatVisible(true)}
                     >
                         <Entypo
                             name='new-message'
@@ -261,6 +295,7 @@ function Messages({ navigation }) {
                             justifyContent:"center",
                             marginLeft:10
                         }}
+                        onPress={() => setCreatNewGroupChatVisible(true)}
                     >
                         <FontAwesome
                             name='group'

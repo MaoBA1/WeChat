@@ -129,7 +129,7 @@ function HomeHeader({ logout, scrollY, setUploadPostModalVisible, setSearchModal
                         alignItems:"center"
                     }}>
                         <Image
-                            source={{ uri: userSelector.profileImage }}
+                            source={{ uri: userSelector?.profileImage }}
                             style={{
                                 width:35,
                                 height:35,

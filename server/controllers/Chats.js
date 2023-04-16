@@ -144,7 +144,7 @@ const chatEvents = (io, socket) => {
                 }
             })
             const currentUserChats = await getAllChatsOfAccountByHisId(creatorId);
-            socket.emit("get_all_chats", { accountChats: currentUserChats });
+            socket.emit("get_all_chats", { accountChats: currentUserChats, newGroupChat: chat });
         })
     })
     

@@ -408,7 +408,7 @@ function UploadPostModal({
     }
 
     const createNewPost = () => {
-        socket.emit("create_post", {
+        socket?.emit("create_post", {
             postAuthor: userSelector,
             postContent: postText,
             postMedia:{

@@ -19,7 +19,7 @@ import Messages from '../screens/overview/Messages';
 import Friends from '../screens/overview/Friends';
 import OtherAccountProfile from '../screens/overview/OtherAccountProfile';
 import PrivateChat from '../screens/overview/PrivateChat';
-
+import GroupChat from '../screens/overview/GroupChat';
 
 const RootStackNavigator = createStackNavigator();
 export const RootStack = () => {
@@ -30,6 +30,7 @@ export const RootStack = () => {
             <RootStackNavigator.Screen name='Register' component={Register} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name='OtherProfile' component={OtherAccountProfile} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name='PrivateChat' component={PrivateChat} options={{ headerShown:false }}/>
+            <RootStackNavigator.Screen name='GroupChat' component={GroupChat} options={{ headerShown:false }}/>
             <RootStackNavigator.Screen name="OverView" component={OverViewStack} options={{ headerShown:false }}/>
         </RootStackNavigator.Navigator>
     )

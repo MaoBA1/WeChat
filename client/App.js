@@ -6,6 +6,17 @@ import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import Reducer from './src/store/reducers/index';
+import { I18nManager, Text, TextInput } from 'react-native';
+
+
+
+I18nManager.forceRTL(false);
+I18nManager.allowRTL(false);
+
+if (Text.defaultProps == null) Text.defaultProps = {};
+if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+Text.defaultProps.allowFontScaling = false;
+TextInput.defaultProps.allowFontScaling = false
 
 const RootReducer = combineReducers({
   Reducer: Reducer

@@ -5,19 +5,21 @@ import Colors from '../../utilities/Colors';
 import IosChatUI from '../../components/IosChatUI';
 import AndroidChatUI from '../../components/AndroidChatUI';
 import { setAllChats } from '../../store/actions';
+import IosGroupChatUI from '../../components/IosGroupChatUI';
+import AndroidGroupChatUI from '../../components/AndroidGroupChatUI';
 
-function PrivateChat({ navigation, route }) {
-    const accountId = route.params.accountId;
+function GroupChat({ navigation, route }) {
+    const chatId = route.params.chatId;
 
     const dispatch = useDispatch();
     const socket = useSelector(state => state.Reducer.Socket);
     const userSelector = useSelector(state => state.Reducer.User);
     const userChats = useSelector(state => state.Reducer.Chats);
 
-    const [ userData, setUserData ] = useState(null);
-    const [ chatId, setChatId ] = useState(null);
+    
     const [ chat, setChat ] = useState(null);
     const [ message, setMessage ] = useState("");
+    const [ participants, setParticipants ] = useState(null);
 
     const flatListRef = useRef(null);
 
@@ -25,24 +27,27 @@ function PrivateChat({ navigation, route }) {
         const getCurrentChatMessages = (data) => {
             if(data) {
                 if(data?.length === 0) return setChat([]);
-                const filterdChats = data?.filter(chat => chat.chatType === "private" && chat.participants
-                .find(p => p._id === accountId) && chat.participants
-                .find(p => p._id === userSelector._id) );
-                if(!chatId) {
-                    setChatId(filterdChats.length === 0 ? null : filterdChats[0]._id);
+                const filterdChats = data?.filter(chat => chat?._id === chatId);
+                if(!chat) {
                     socket?.emit("mark_all_chat_messages_as_readed", { chatId: filterdChats[0]?._id, currentUserAccountId: userSelector?._id });
+                }
+                if(!participants) {
+                    setParticipants(
+                        filterdChats?.length === 0 ? null 
+                        :
+                        filterdChats[0]?.participants?.length > 6 ?
+                        filterdChats[0]?.participants?.map(p => p?.fname + " " + p?.lname).slice(0,6).join(", ") + "...." 
+                        : 
+                        filterdChats[0]?.participants?.map(p => p?.fname + " " + p?.lname).slice(0,6).join(", ")
+                    );
                 }
                 return setChat(filterdChats.length === 0 ? [] : filterdChats[0].messages);
             }
             return setChat([]);
         }
 
-        if(userChats && userData && !chat) {
+        if(userChats && !chat) {
             getCurrentChatMessages(userChats);
-        }
-
-        if(!userData) {
-            socket?.emit('get_account_by_id', { accountId: accountId });
         }
 
         const handelReciveMessage = async(data) => {
@@ -54,13 +59,11 @@ function PrivateChat({ navigation, route }) {
             }    
         }
 
-        socket?.on('get_account_by_id', (response) => setUserData(response.account));
         socket?.on("get_all_chats", handelReciveMessage);
         return () => {
-            socket?.off('get_account_by_id', setUserData);
             socket?.off("get_all_chats", handelReciveMessage);
         }
-    },[userData, flatListRef.current, chat]);
+    },[flatListRef.current, chat]);
 
 
     const islocalDateStringRequired = (item, index, list) => {
@@ -70,16 +73,12 @@ function PrivateChat({ navigation, route }) {
 
     const sendMessage = () => {
         if(message.length === 0) return;
-        if(!chatId) {
-            socket?.emit("send_first_private_message", { accountId1: userSelector._id, accountId2: userData._id, message });
-        } else {
-            socket?.emit("send_private_message", { chatId, message, accountId1: userSelector._id, accountId2: userData._id });
-        }
+        socket?.emit("send_group_message", { chatId, senderId: userSelector._id, message });
         return setMessage("");
     }
 
     
-    if(!userData) {
+    if(!chat || !participants) {
         return <View style={{ 
             justifyContent:"center",
             backgroundColor: Colors.whiteBackground,
@@ -99,30 +98,30 @@ function PrivateChat({ navigation, route }) {
     
     if(Platform.OS === "ios") {
         return(
-            <IosChatUI
+            <IosGroupChatUI
                 flatListRef={flatListRef}
                 goBack={() => navigation.goBack(null)}
-                userData={userData}
                 chat={chat}
                 islocalDateStringRequired={islocalDateStringRequired}
                 userSelector={userSelector}
                 message={message}
                 setMessage={setMessage}
                 sendMessage={sendMessage}
+                participants={participants}
             />
         )
     } else {
         return(
-            <AndroidChatUI
+            <AndroidGroupChatUI
                 flatListRef={flatListRef}
                 goBack={() => navigation.goBack(null)}
-                userData={userData}
                 chat={chat}
                 islocalDateStringRequired={islocalDateStringRequired}
                 userSelector={userSelector}
                 message={message}
                 setMessage={setMessage}
                 sendMessage={sendMessage}
+                participants={participants}
             />
         )
     }
@@ -130,4 +129,4 @@ function PrivateChat({ navigation, route }) {
 }
 
 
-export default PrivateChat;
+export default GroupChat;
