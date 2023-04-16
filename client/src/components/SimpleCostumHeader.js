@@ -7,13 +7,7 @@ function SimpleCostumHeader({ text }) {
     
     return (  
         <View 
-            style={{
-                // position:"absolute",
-                width:"100%",
-                // top: 0,
-                // left: 0,
-                // right: 0,
-            }}
+            style={{ width:"100%" }}
         > 
             <LinearGradient 
                 colors={[Colors.blue1, Colors.purple1]}
@@ -23,7 +17,7 @@ function SimpleCostumHeader({ text }) {
                     width:"100%", 
                     height:110,
                     alignItems:"center",
-                    justifyContent:"center"
+                    justifyContent:"center",
                 }}
             > 
                 <Text style={{

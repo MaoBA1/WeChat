@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, ActivityIndicator, Animated } from 'react-native';
+import { View, ActivityIndicator, Animated, Text } from 'react-native';
 import Colors from '../../utilities/Colors';
 import OtherProfileHeader from '../../components/OtherProfileHeader';
 import { useSelector } from 'react-redux';
@@ -60,23 +60,45 @@ function OtherAccountProfile({ navigation, route }) {
                 cleanPost={() => setPostForCommentModal(null)}
                 post={postForCommentModal}
             />
-            <Animated.FlatList
-                style={{ flex:1 }}
-                contentContainerStyle={{ paddingTop:160 }}
-                data={allPostSelector.filter(p => p?.postAuthor._id === thisAccountId)}
-                keyExtractor={item => item._id}
-                renderItem={({item, index}) => 
-                    <Post
-                        post={item}
-                        setCommentModalVisible={setCommentModalVisible}
-                        setPostForCommentModal={() => setPostForCommentModal(item)}
+            {
+                allPostSelector?.filter(p => p?.postAuthor._id === thisAccountId)?.length > 0 ?
+                (
+                    <Animated.FlatList
+                        style={{ flex:1 }}
+                        contentContainerStyle={{ paddingTop:160 }}
+                        data={allPostSelector.filter(p => p?.postAuthor._id === thisAccountId)}
+                        keyExtractor={item => item._id}
+                        renderItem={({item, index}) => 
+                            <Post
+                                post={item}
+                                setCommentModalVisible={setCommentModalVisible}
+                                setPostForCommentModal={() => setPostForCommentModal(item)}
+                            />
+                        }
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                            { useNativeDriver: true }
+                        )}
                     />
-                }
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
-                )}
-            />
+                )
+                :
+                (
+                    <View style={{
+                        flex:1,
+                        width:"100%",
+                        alignItems:"center",
+                        justifyContent:"center"
+                    }}>
+                        <Text style={{
+                            fontFamily:"regular",
+                            color:Colors.blue1,
+                            fontSize:18
+                        }}>
+                            This account didn't upload any post yet
+                        </Text>
+                    </View>
+                )
+            }
             <OtherProfileHeader
                 scrollY={scrollY}
                 account={thisAccount}

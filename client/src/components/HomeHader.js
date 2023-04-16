@@ -8,7 +8,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 
 
-function HomeHeader({ logout, scrollY, setUploadPostModalVisible }) {
+function HomeHeader({ logout, scrollY, setUploadPostModalVisible, setSearchModalVisible }) {
     const userSelector = useSelector(state => state.Reducer.User);
     
     const headerTranslateY = scrollY.interpolate({
@@ -91,6 +91,7 @@ function HomeHeader({ logout, scrollY, setUploadPostModalVisible }) {
                                     backgroundColor:"#FFFFFFFF",
                                     borderRadius:50,
                                 }}
+                                onPress={() => setSearchModalVisible(true)}
                             >
                                 <Feather
                                     name="search"

@@ -5,15 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeHeader from '../../components/HomeHader';
 import { CommonActions } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAllPosts, setAllAccountPosts, setAll, setUser } from '../../store/actions';
+import { setAllPosts, setAllAccountPosts, setAllChats, setUser } from '../../store/actions';
 import Post from '../../components/Post';
 import PostCommentsModal from './Modals/PostCommentsModal';
 import UploadPostModal from './Modals/UploadPostModal';
+import SearchModal from './Modals/SearchModal';
 
 function Home({ navigation }) {
     const dispatch = useDispatch();
     const socket = useSelector(state => state.Reducer.Socket);
     const userSelector = useSelector(state => state.Reducer.User);
+    const userChats = useSelector(state => state.Reducer.Chats);
     const allPostSelector = useSelector(state => state.Reducer.Posts);
     const friends = userSelector?.friends;
 
@@ -21,7 +23,7 @@ function Home({ navigation }) {
     const [ postForCommentModal, setPostForCommentModal ] = useState(null);
     const [ commentModalVisible, setCommentModalVisible ] = useState(false);
     const [ uploadPostModatVisible, setUploadPostModalVisible ] = useState(false);
-    
+    const [ searchModalVisible, setSearchModalVisible ] = useState(false);
     
     const loguot = async() => {
         try {
@@ -45,12 +47,24 @@ function Home({ navigation }) {
     }
     const scrollY = useRef(new Animated.Value(0)).current;
     useEffect(() => {
+        if(!userChats) {
+            socket?.emit("get_all_chats", { accountId: userSelector?._id });
+        } 
+
         const handelUserChanges = (data) => {
             try {
                 dispatch(setUser(data.account || data));
             } catch(error) {
                 console.log(error.message);
             }
+        }
+
+        const handelReciveMessage = async(data) => {
+            try {
+                await dispatch(setAllChats(data.accountChats));
+            } catch(error) {
+              console.log(error.message);   
+            }    
         }
 
 
@@ -62,11 +76,13 @@ function Home({ navigation }) {
         socket?.on("recive_all_account_posts", (response) => setAllAccountPosts(response, dispatch));
         socket?.on("get_updated_post", (response) => setPostForCommentModal(response.updated_post));
         socket?.on("account_changes", handelUserChanges);
+        socket?.on("get_all_chats", handelReciveMessage);
         return () => {
             socket?.off("recive_all_post", setAllPosts);
             socket?.off("get_updated_post", setPostForCommentModal);
             socket?.off("recive_all_account_posts", setAllAccountPosts);
             socket?.off("account_changes", handelUserChanges);
+            socket?.off("get_all_chats", handelReciveMessage);
         }
     }, []);
     
@@ -103,10 +119,16 @@ function Home({ navigation }) {
                 setIsVisible={setUploadPostModalVisible}
             />
             
+            <SearchModal
+                visible={searchModalVisible}
+                setIsVisible={setSearchModalVisible}
+                navigate={navigation.navigate}
+            />
+
             <Animated.FlatList
                 style={{ flex:1 }}
                 contentContainerStyle={{ paddingTop:120 }}
-                data={allPostSelector?.filter(p => friends?.map(f => f._id).includes(p?.postAuthor?._id.toString()))}
+                data={allPostSelector?.filter(p => friends?.filter(f => f.status === "friend")?.map(f => f._id).includes(p?.postAuthor?._id.toString()))}
                 keyExtractor={item => item._id}
                 renderItem={({item, index}) => 
                     <Post
@@ -121,7 +143,12 @@ function Home({ navigation }) {
                     { useNativeDriver: true }
                 )}
             />
-            <HomeHeader logout={loguot} scrollY={scrollY} setUploadPostModalVisible={setUploadPostModalVisible}/>
+            <HomeHeader 
+                logout={loguot} 
+                scrollY={scrollY} 
+                setUploadPostModalVisible={setUploadPostModalVisible}
+                setSearchModalVisible={setSearchModalVisible}
+            />
         </View>
     );
 }

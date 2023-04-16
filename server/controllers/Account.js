@@ -327,6 +327,16 @@ const accountEvents = (io, socket) => {
         return socket.emit("get_all_user_friend", { AllFriendsAccounts });
         
     })
+
+    socket.on("get_accounts_by_search_keyword", async(data) => {
+        const { keyword } = data;
+        const regex = new RegExp(keyword, 'i');
+        Account.find({ $or: [{ fname: regex }, { lname: regex }] })
+        .then(accounts => {
+            console.log(accounts);
+            socket.emit("get_accounts_by_search_keyword", { accounts: accounts});
+        })
+    })
 }
 
 
