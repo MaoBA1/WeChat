@@ -1,6 +1,6 @@
 import React, { useState } from 'react';  
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, TouchableOpacity, Text, Animated, Image } from 'react-native';
+import { View, TouchableOpacity, Text, Animated, Image, Modal } from 'react-native';
 import Colors from '../utilities/Colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
@@ -14,6 +14,9 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
     const userPostSelector = useSelector(state => state.Reducer.AccountPosts);
     const socket = useSelector(state => state.Reducer.Socket);
 
+    const [ showReplacImageModal, setShowReplaceImageModal ] = useState(true);
+    const [ isInProcess, setIsInProcess ] = useState(false);
+    const [ processPrecent, setProcessPresent ] = useState(0);
     const [ pickedImage, setPickedImage ] = useState(null);
 
     const headerTranslateY = scrollY.interpolate({
@@ -41,20 +44,20 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
             const response = await fetch(pickerResult.assets[0].uri);
             const blob = await response.blob();
             const imageRef = ref(storage, "profileImages/" + ImageName);
-            // setIsInProcess(true);
+            setIsInProcess(true);
             const uploadTask = uploadBytesResumable(imageRef, blob);
             uploadTask.on('state_changed', 
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                     console.log('Upload is ' + progress + '% done');
-                    // setProcessPresent(progress.toFixed());
+                    setProcessPresent(progress.toFixed());
                 },
                 (error) => {
                     console.log(error.message);
                 }, 
                 () => {
-                    // setProcessPresent(0);
-                    // setIsInProcess(false);
+                    setProcessPresent(0);
+                    setIsInProcess(false);
                     return getDownloadURL(uploadTask.snapshot.ref)
                     .then(downloadUrl => {
                         setPickedImage({downloadUrl, name: ImageName});
@@ -77,6 +80,66 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
                 right: 0,
             }}
         > 
+            <Modal
+                visible={showReplacImageModal}
+                transparent
+                animationType='slide'
+            >
+                <View style={{
+                    flex:1,
+                    backgroundColor:"grey",
+                    opacity:0.5,
+                }}/>
+                <View style={{
+                    width:"80%",
+                    height:250,
+                    backgroundColor:"#FFFFFFFF",
+                    position:"absolute",
+                    alignSelf:"center",
+                    top:"30%",
+                    alignItems:"center",
+                    justifyContent:"center"
+                }}>
+                    {
+                       isInProcess ? 
+                       (
+                            <View style={{
+                                width:"80%",
+                                height:30,
+                                borderWidth:2,
+                                borderColor: Colors.blue1,
+                                alignSelf:"center",
+                                borderRadius:20,
+                                padding:2
+                            }}>
+                                <LinearGradient
+                                    colors={[Colors.blue1, Colors.purple1]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={{
+                                        height:"100%",
+                                        width:`${processPrecent}%`,
+                                        borderRadius:20
+                                    }}
+                                />
+                            </View>
+                       )
+                       :
+                       (
+                        <View>
+                            <Image
+                                source={{ uri: userSelector.profileImage }}
+                                style={{
+                                    width:100,
+                                    height:100,
+                                    borderRadius:50
+                                }}
+                            />
+                        </View>
+                       ) 
+                    }
+                </View>
+            </Modal>
             <LinearGradient 
                 colors={[Colors.blue1, Colors.purple1]}
                 start={{ x: 0, y: 0 }}
