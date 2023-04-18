@@ -10,7 +10,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, deleteObject, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '../../../../firebase';
+import { storage, getNameForStorage } from '../../../../firebase';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Video } from 'expo-av';
 import { Keyboard } from 'react-native';
@@ -113,9 +113,10 @@ const PostMediaComponent = ({
     const [ isInProcess, setIsInProcess ] = useState(false);
 
     const handelUpload = async({media, mediaType}) => {
+        let nameForMedia = getNameForStorage(media);
         const response = await fetch(media);
         const blob = await response.blob();
-        const imageRef = ref(storage, "postsMedia/" + media);
+        const imageRef = ref(storage, "postsMedia/" + nameForMedia);
         setIsInProcess(true);
         const uploadTask = uploadBytesResumable(imageRef, blob);
         uploadTask.on('state_changed', 
@@ -132,7 +133,7 @@ const PostMediaComponent = ({
                 setIsInProcess(false);
                 return getDownloadURL(uploadTask.snapshot.ref)
                 .then(downloadUrl => {
-                    setMediaArray((mediaList) => [...mediaList, {downloadUrl, name: media, mediaType: mediaType}]);
+                    setMediaArray((mediaList) => [...mediaList, {downloadUrl, name: nameForMedia, mediaType: mediaType}]);
                 })
             }
         )

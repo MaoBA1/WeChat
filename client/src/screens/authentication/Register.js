@@ -20,7 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import RegisterStyle from './style/RegisterStyle';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, deleteObject, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '../../../firebase';
+import { storage, getNameForStorage } from '../../../firebase';
 import serverBaseUrl from '../../../serverBaseUrl';
 
 
@@ -44,9 +44,10 @@ function Register({ navigation }) {
         }
         let pickerResult = await ImagePicker.launchImageLibraryAsync();
         if(!pickerResult.canceled) {
+            let ImageName = getNameForStorage(pickerResult.assets[0].uri); 
             const response = await fetch(pickerResult.assets[0].uri);
             const blob = await response.blob();
-            const imageRef = ref(storage, "profileImages/" + pickerResult.assets[0].uri);
+            const imageRef = ref(storage, "profileImages/" + ImageName);
             setIsInProcess(true);
             const uploadTask = uploadBytesResumable(imageRef, blob);
             uploadTask.on('state_changed', 
@@ -63,7 +64,7 @@ function Register({ navigation }) {
                     setIsInProcess(false);
                     return getDownloadURL(uploadTask.snapshot.ref)
                     .then(downloadUrl => {
-                        setPickedImage({downloadUrl, name: pickerResult.assets[0].uri});
+                        setPickedImage({downloadUrl, name: ImageName});
                     })
                 }
             )

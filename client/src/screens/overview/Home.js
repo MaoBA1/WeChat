@@ -52,8 +52,9 @@ function Home({ navigation }) {
         } 
 
         const handelUserChanges = (data) => {
+            const account_updated = data.account ? data.account : data.account_updated 
             try {
-                dispatch(setUser(data.account || data));
+                dispatch(setUser(account_updated));
             } catch(error) {
                 console.log(error.message);
             }
@@ -76,12 +77,14 @@ function Home({ navigation }) {
         socket?.on("recive_all_account_posts", (response) => setAllAccountPosts(response, dispatch));
         socket?.on("get_updated_post", (response) => setPostForCommentModal(response.updated_post));
         socket?.on("account_changes", handelUserChanges);
+        socket?.on("auth_user", handelUserChanges);
         socket?.on("get_all_chats", handelReciveMessage);
         return () => {
             socket?.off("recive_all_post", setAllPosts);
             socket?.off("get_updated_post", setPostForCommentModal);
             socket?.off("recive_all_account_posts", setAllAccountPosts);
             socket?.off("account_changes", handelUserChanges);
+            socket?.off("account_updated", handelUserChanges);
             socket?.off("get_all_chats", handelReciveMessage);
         }
     }, []);

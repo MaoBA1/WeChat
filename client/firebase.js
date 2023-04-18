@@ -14,7 +14,10 @@ const firebaseConfig = {
   appId: "1:1014385980849:web:f06aceffd2e97fa7e7f990"
 };
 
-
+export const getNameForStorage = (name) => {
+  let shortName = name.split('/').join().split(',');
+  return shortName[shortName.length -1]; 
+}
 
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
