@@ -8,6 +8,8 @@ import { storage, getNameForStorage } from '../../firebase';
 import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
     const userSelector = useSelector(state => state.Reducer.User);
@@ -126,15 +128,39 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
                        )
                        :
                        (
-                        <View>
-                            <Image
-                                source={{ uri: userSelector.profileImage }}
+                        <View style={{                            
+                            alignItems:"center",
+                            justifyContent:"center",
+                            height:"70%",
+                            justifyContent:"space-evenly"
+                        }}>
+                            <View>                                
+                                <Image
+                                    source={{ uri: userSelector.profileImage }}
+                                    style={{
+                                        width:100,
+                                        height:100,
+                                        borderRadius:50
+                                    }}
+                                />
+                            </View>
+                            <TouchableOpacity
                                 style={{
-                                    width:100,
-                                    height:100,
-                                    borderRadius:50
+                                    backgroundColor: Colors.purple1,
+                                    flexDirection:"row",
+                                    width:60,
+                                    height:30,
+                                    borderRadius:20,
+                                    alignItems:"center",
+                                    justifyContent:"space-around"
                                 }}
-                            />
+                            >
+                                <AntDesign
+                                    name='like1'
+                                    color={"#FFFFFF"}
+                                    size={20}
+                                />                                
+                            </TouchableOpacity>
                         </View>
                        ) 
                     }
