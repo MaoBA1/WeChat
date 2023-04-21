@@ -16,7 +16,7 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
     const userPostSelector = useSelector(state => state.Reducer.AccountPosts);
     const socket = useSelector(state => state.Reducer.Socket);
 
-    const [ showReplacImageModal, setShowReplaceImageModal ] = useState(true);
+    const [ showReplacImageModal, setShowReplaceImageModal ] = useState(false);
     const [ isInProcess, setIsInProcess ] = useState(false);
     const [ processPrecent, setProcessPresent ] = useState(0);
     const [ pickedImage, setPickedImage ] = useState(null);
@@ -47,6 +47,7 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
             const blob = await response.blob();
             const imageRef = ref(storage, "profileImages/" + ImageName);
             setIsInProcess(true);
+            setShowReplaceImageModal(true);
             const uploadTask = uploadBytesResumable(imageRef, blob);
             uploadTask.on('state_changed', 
                 (snapshot) => {
@@ -134,7 +135,30 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
                             height:"70%",
                             justifyContent:"space-evenly"
                         }}>
-                            <View>                                
+                            <View> 
+                                <TouchableOpacity
+                                    style={{
+                                        width:25,
+                                        height:25,
+                                        borderRadius:50,
+                                        backgroundColor:"grey",
+                                        alignItems:"center",
+                                        justifyContent:"center",
+                                        position:"absolute",
+                                        zIndex:1,
+                                        right:0
+                                    }}
+                                    onPress={() => {
+                                        socket?.emit("cancel_change_profile_image", { accountId: userSelector._id })
+                                        setShowReplaceImageModal(false);
+                                    }}
+                                >
+                                    <FontAwesome
+                                        name='close'
+                                        color={"#FFFFFFFF"}
+                                        size={20}
+                                    />  
+                                </TouchableOpacity>                             
                                 <Image
                                     source={{ uri: userSelector.profileImage }}
                                     style={{
@@ -144,7 +168,10 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
                                     }}
                                 />
                             </View>
-                            <TouchableOpacity
+                            <LinearGradient
+                                colors={[Colors.blue1, Colors.purple1]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
                                 style={{
                                     backgroundColor: Colors.purple1,
                                     flexDirection:"row",
@@ -155,12 +182,14 @@ function ProfileHeader({ scrollY, friendsCount, setUploadPostModalVisible }) {
                                     justifyContent:"space-around"
                                 }}
                             >
-                                <AntDesign
-                                    name='like1'
-                                    color={"#FFFFFF"}
-                                    size={20}
-                                />                                
-                            </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setShowReplaceImageModal(false)}>
+                                    <AntDesign
+                                        name='like1'
+                                        color={"#FFFFFF"}
+                                        size={20}
+                                    />                                
+                                </TouchableOpacity>
+                            </LinearGradient>
                         </View>
                        ) 
                     }

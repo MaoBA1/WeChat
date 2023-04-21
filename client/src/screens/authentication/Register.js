@@ -22,6 +22,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref, deleteObject, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { storage, getNameForStorage } from '../../../firebase';
 import serverBaseUrl from '../../../serverBaseUrl';
+import { Platform } from 'react-native';
 
 
 
@@ -126,7 +127,7 @@ function Register({ navigation }) {
 
 
     return (  
-        <KeyboardAvoidingView behavior='position' style={{ flex:1 }}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "position" : "height"} style={{ flex:1 }}>
             <Modal 
                 visible={signUpResponse.length > 0}
                 transparent={true}

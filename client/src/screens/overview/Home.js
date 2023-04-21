@@ -52,6 +52,7 @@ function Home({ navigation }) {
         } 
 
         const handelUserChanges = (data) => {
+            console.log(data);
             const account_updated = data.account ? data.account : data.account_updated 
             try {
                 dispatch(setUser(account_updated));
@@ -78,12 +79,14 @@ function Home({ navigation }) {
         socket?.on("get_updated_post", (response) => setPostForCommentModal(response.updated_post));
         socket?.on("account_changes", handelUserChanges);
         socket?.on("auth_user", handelUserChanges);
+        socket?.on("account_updated", handelUserChanges);
         socket?.on("get_all_chats", handelReciveMessage);
         return () => {
             socket?.off("recive_all_post", setAllPosts);
             socket?.off("get_updated_post", setPostForCommentModal);
             socket?.off("recive_all_account_posts", setAllAccountPosts);
             socket?.off("account_changes", handelUserChanges);
+            socket?.on("auth_user", handelUserChanges);
             socket?.off("account_updated", handelUserChanges);
             socket?.off("get_all_chats", handelReciveMessage);
         }

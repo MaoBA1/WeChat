@@ -12,6 +12,7 @@ import { loginAction, getUser } from '../../store/actions/index';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setupSocket } from '../../../SetupScoket';
+import { Platform } from 'react-native';
 
 
 function Login({ navigation }) {
@@ -181,7 +182,7 @@ function Login({ navigation }) {
     }
     
     return (  
-        <KeyboardAvoidingView behavior={forgetPasswordVisible ? "height" : "position"} style={{ flex:1 }} >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "position" : "height"} style={{ flex:1 }} >
             <ForgetPasswordModal
                 visible={forgetPasswordVisible}
                 setVisible={setForgetPasswordVisible}
@@ -192,7 +193,7 @@ function Login({ navigation }) {
                         alignItems:"center",
                         justifyContent:"center",
                         opacity:opacityValue,
-                        flex:0.45,
+                        flex:0.4,
                     }}>
                         {animations[animationIndex]}
                     </Animated.View>

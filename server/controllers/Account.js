@@ -166,7 +166,6 @@ const accountEvents = (io, socket) => {
     socket.on("change_profile_image", (data) => {
         const accountId = data.account._id;
         const newImageUrl = data.newImageUrl;
-        
         Account.findById(accountId)
         .then(account => {
             account.lastProfileImage = account.profileImage;
@@ -185,7 +184,7 @@ const accountEvents = (io, socket) => {
     })
 
     socket.on("cancel_change_profile_image", (data) => {
-        const accountId = data.account._id;
+        const { accountId } = data;
         Account.findById(accountId)
         .then(account => {
             account.profileImage = account.lastProfileImage;

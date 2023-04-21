@@ -8,13 +8,13 @@ export default StyleSheet.create({
         height:"100%"
     },
     backIconContainer: {
-        height:110,
+        height:80,
         justifyContent:"center",
         paddingLeft: 15
     },
     titleContainer: {
         marginTop:80,
-        height:150,
+        height:100,
         alignItems:"center"
     },
     title: {

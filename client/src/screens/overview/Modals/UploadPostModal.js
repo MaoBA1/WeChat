@@ -264,7 +264,7 @@ const PostMediaComponent = ({
                     )
                     :
                     (
-                        <Swiper>
+                        <Swiper loop={true} showsButtons showsHorizontalScrollIndicator>
                             {
                                 mediaArray.map((item, index) => 
                                     <View key={index} style={{
