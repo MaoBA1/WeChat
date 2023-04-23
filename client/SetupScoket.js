@@ -13,7 +13,7 @@ const setNewSocket = (dispatch, socket) => {
 
 export const setupSocket = async(token, dispatch) => {
     if (token) {
-      const newSocket = io(serverBaseUrl.productionServerSocketUrl, {
+      const newSocket = io(serverBaseUrl.localServerSocketUrl, {
         query: {
           token: token
         },

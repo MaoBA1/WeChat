@@ -9,7 +9,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../store/actions';
 
-function OtherProfileHeader({ scrollY, account, goBack }) {
+function OtherProfileHeader({ scrollY, account, goBack, navigation }) {
     const dispatch = useDispatch();
     const userSelector = useSelector(state => state.Reducer.User);
     const userPostSelector = useSelector(state => state.Reducer.AccountPosts);
@@ -276,6 +276,7 @@ function OtherProfileHeader({ scrollY, account, goBack }) {
                                     backgroundColor:"#FFFFFFFF",
                                     borderRadius:50,
                                 }}
+                                onPress={() => navigation.navigate("PrivateChat", { accountId: account?._id})}
                             >
                                 <Ionicons
                                     name="chatbubble-ellipses"

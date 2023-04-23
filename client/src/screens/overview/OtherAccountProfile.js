@@ -103,6 +103,7 @@ function OtherAccountProfile({ navigation, route }) {
                 scrollY={scrollY}
                 account={thisAccount}
                 goBack={() => navigation.goBack(null)}
+                navigation={navigation}
             />
         </View>
     );
